@@ -3,6 +3,13 @@ function! StackYank()
        call extend(g:stackYank, split(getreg("0"), "\n"))
        echom g:stackYank
 endfunction
+function! StackYankIfInc(value, beforeExpression)
+  let exBefore = "normal! " . a:beforeExpression
+  execute exBefore
+  if (stridx(getreg("0"), a:value) > -1)
+    call StackYank()
+  endif
+endfunction
 function! InsertFromStackLIFO() 
     if (len(g:stackYank)<=0)
         echom "stack ist empty"
@@ -38,6 +45,7 @@ endfunction
 function! ClearStackYank()
     let g:stackYank = []
 endfunction
+command! -nargs=+ -range StackYankInc <line1>,<line2>call StackYankIfInc(split(<q-args>)[0], split(<q-args>)[1])
 nnoremap <leader>y yiw:call StackYank()<cr>
 nnoremap <leader>i :call InsertFromStackLIFO()<cr>
 nnoremap <leader>I $:call InsertFromStackLIFO()<cr>
